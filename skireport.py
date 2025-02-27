@@ -18,11 +18,16 @@ def scrape_and_split_screenshot_snow_data():
     url = "https://www.j2ski.com/snow_forecast/Japan/"
     
     try:
+        # 获取当前日期作为文件名前缀
+        date_prefix = datetime.now().strftime('%Y-%m-%d')
+        
         # 设置Chrome为移动设备模式
         chrome_options = Options()
         chrome_options.add_argument("--headless")  # 无头模式
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=390,2000")  # 增加高度以容纳完整表格
+        chrome_options.add_argument("--no-sandbox")  # 在GitHub Actions中需要
+        chrome_options.add_argument("--disable-dev-shm-usage")  # 在GitHub Actions中需要
         
         # 设置移动设备模拟
         mobile_emulation = {
@@ -32,7 +37,7 @@ def scrape_and_split_screenshot_snow_data():
         chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
         
         # 初始化WebDriver
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get(url)
         
         # 等待页面加载
@@ -58,8 +63,8 @@ def scrape_and_split_screenshot_snow_data():
         output_dir = 'japan_snow_reports'
         os.makedirs(output_dir, exist_ok=True)
         
-        # 截图整个表格
-        full_screenshot_path = os.path.join(output_dir, 'topResortsSnow_mobile_full.png')
+        # 截图整个表格 - 添加日期前缀
+        full_screenshot_path = os.path.join(output_dir, f'{date_prefix}_topResortsSnow_mobile_full.png')
         table.screenshot(full_screenshot_path)
         
         # 获取表格中所有行
@@ -80,9 +85,6 @@ def scrape_and_split_screenshot_snow_data():
         soup = BeautifulSoup(html_content, 'html.parser')
         table_html = soup.find('table', id='topResortsSnow')
         tr_elements = table_html.find_all('tr')
-        
-        # 计算每行的高度并找到合适的分割点
-        # 目标是在表格的中间位置找到一个行与行之间的边界
         
         # 使用PIL直接处理图片
         # 首先，我们需要确定表格的总高度
@@ -108,13 +110,13 @@ def scrape_and_split_screenshot_snow_data():
         split_point = min(split_point, img_height - 100)  # 确保第二部分至少有100像素高
         split_point = max(split_point, 100)  # 确保第一部分至少有100像素高
         
-        # 分割图片
+        # 分割图片 - 添加日期前缀
         img1 = img.crop((0, 0, width, split_point))
         img2 = img.crop((0, split_point, width, height))
         
-        # 保存分割后的图片
-        img1_path = os.path.join(output_dir, 'topResortsSnow_part1.png')
-        img2_path = os.path.join(output_dir, 'topResortsSnow_part2.png')
+        # 保存分割后的图片 - 添加日期前缀
+        img1_path = os.path.join(output_dir, f'{date_prefix}_topResortsSnow_part1.png')
+        img2_path = os.path.join(output_dir, f'{date_prefix}_topResortsSnow_part2.png')
         img1.save(img1_path)
         img2.save(img2_path)
         
@@ -138,19 +140,19 @@ def scrape_and_split_screenshot_snow_data():
         # 生成描述
         description = generate_description(df)
         
-        # 保存描述
-        description_path = os.path.join(output_dir, 'topResortsSnow_description.txt')
+        # 保存描述 - 添加日期前缀
+        description_path = os.path.join(output_dir, f'{date_prefix}_topResortsSnow_description.txt')
         with open(description_path, 'w', encoding='utf-8') as f:
             f.write(description)
         
         print(f"截图和描述已保存到 {output_dir} 目录")
-        return [img1_path, img2_path], description
+        return [img1_path, img2_path], description, date_prefix
         
     except Exception as e:
         print(f"抓取数据时出错: {e}")
         import traceback
         traceback.print_exc()
-        return None, None
+        return None, None, None
 
 def generate_description(df):
     """根据表格数据生成描述"""
@@ -229,7 +231,8 @@ def generate_description(df):
         return f"生成描述时出错: {str(e)}"
 
 if __name__ == "__main__":
-    screenshot_paths, description = scrape_and_split_screenshot_snow_data()
+    screenshot_paths, description, date_prefix = scrape_and_split_screenshot_snow_data()
     if description:
         print("\n" + description)
         print(f"\n图片已保存为: {screenshot_paths}")
+        print(f"\n描述文件已保存为: {date_prefix}_topResortsSnow_description.txt")

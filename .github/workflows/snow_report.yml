@@ -1,0 +1,54 @@
+name: Daily Japan Snow Report
+
+on:
+  schedule:
+    # 每天早上8点运行 (UTC时间0点，需要根据您的时区调整)
+    - cron: '0 0 * * *'  # UTC时间0点，对应北京时间8点
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  generate-snow-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 需要写入权限来推送更改
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install Chrome
+      run: |
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 pandas selenium webdriver-manager pillow
+        
+    - name: Run snow report script
+      run: python snow_report.py
+      
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        
+        # 添加所有生成的文件
+        git add japan_snow_reports/
+        
+        # 获取当前日期
+        DATE=$(date +"%Y-%m-%d")
+        
+        # 提交更改
+        git commit -m "Update snow report for $DATE" || echo "No changes to commit"
+        
+        # 推送更改
+        git push
