@@ -190,7 +190,7 @@ def generate_description(df):
         top5_7day = df.sort_values(snow_7day_col, ascending=False).head(5)
         
         # 生成描述文本
-        description = f"""日本滑雪场降雪预报分析 ({current_date})
+        description = f"""日本最新滑雪场降雪预报分析 ({current_date})
 
 根据J2Ski网站的最新数据，日本滑雪场的降雪预报如下：
 
@@ -223,7 +223,7 @@ def generate_description(df):
             for i, (_, row) in enumerate(top3_48hr.iterrows(), 1):
                 description += f"{i}. {row[resort_col]}: {row[snow_48hr_col]}厘米\n"
             
-        description += "\n此数据截取自J2Ski网站，更新于" + current_date
+        description += "\n数据更新于" + current_date
         
         return description
         
