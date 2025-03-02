@@ -1,0 +1,26 @@
+日本滑雪场降雪预报分析 (2025-03-02)
+
+根据J2Ski网站的最新数据，日本滑雪场的降雪预报如下：
+
+- 共收录60个日本滑雪场的降雪预报
+- 其中55个滑雪场未来7天预计有降雪
+- 未来7天最大降雪量为50.0厘米，位于Myoko Akakura / Shinakakura
+- 平均预计7天降雪量为20.4厘米
+
+未来7天降雪量前5名滑雪场：
+1. Myoko Akakura / Shinakakura: 50.0厘米
+2. Myoko Pine Valley: 48.0厘米
+3. Togakushi: 45.0厘米
+4. Hakuba Norikura: 41.0厘米
+5. Iwappara: 37.0厘米
+
+未来48小时有46个滑雪场预计有降雪
+未来48小时最大降雪量为33.0厘米，位于Hakuba Cortina Kokusai
+平均预计48小时降雪量为11.7厘米
+
+未来48小时降雪量前3名滑雪场：
+1. Hakuba Cortina Kokusai: 33.0厘米
+2. Myoko Akakura / Shinakakura: 28.0厘米
+3. Naeba: 26.0厘米
+
+此数据截取自J2Ski网站，更新于2025-03-02
